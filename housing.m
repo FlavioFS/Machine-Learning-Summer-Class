@@ -1,0 +1,1 @@
+[xMatrix, yArray]  = dataLoader('data/housing.data');
