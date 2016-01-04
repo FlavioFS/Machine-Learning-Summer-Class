@@ -1,4 +1,4 @@
-function [xData, yArray] = dataLoader(filePath)
+function [xData, yArray] = dataLoader(filePath, lineStart, lineEnd)
 	% Reads the file and returns the data matrix and the values array
 	columnCount = 0;
 	dataFile = fopen(filePath, 'r');
@@ -33,7 +33,17 @@ function [xData, yArray] = dataLoader(filePath)
 	end
 
 	% Converts the string elements to double
-	xData  = cellfun(@str2double,  xData);
-	yArray = cellfun(@str2double, yArray);
+	xData  = cellfun(@str2num,  xData);
+	yArray = cellfun(@str2num, yArray);
 
+	% Splits the matrix through the line delimiter
+	if (nargin == 3)
+		if (lineStart > lineEnd)
+			temp = lineStart;
+			lineStart = lineEnd;
+			lineEnd = temp;
+		end
+		xData = xData(lineStart:lineEnd, :);
+		yArray = yArray(lineStart:lineEnd, :);
+	end
 end
