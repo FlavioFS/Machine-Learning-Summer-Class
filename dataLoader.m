@@ -36,6 +36,11 @@ function [xData, yArray] = dataLoader(filePath, lineStart, lineEnd)
 	xData  = cellfun(@str2num,  xData);
 	yArray = cellfun(@str2num, yArray);
 
+	% Shuffling
+	newOrder = randperm(size(yArray,1));
+	xData  = xData(newOrder, :);
+	yArray = yArray(newOrder, :);
+
 	% Splits the matrix through the line delimiter
 	if (nargin == 3)
 		if (lineStart > lineEnd)

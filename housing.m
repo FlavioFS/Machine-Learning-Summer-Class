@@ -1,37 +1,41 @@
 % Loading
 first = 1;
-last  = 253;
+last  = 506;
+half = 253;
 [X, Y]  = dataLoader('data/housing.data', first, last);
 
 % Calculating A
-B = ones(size(X)(1), 1);
-X = [B X];
-Xt = transpose(X);
-A = inv(Xt*X)*Xt*Y;
+B = ones(half, 1);
+Xtraining = [B X(1:half, :)];
+Ytraining = Y(1:half, :);
+XtrainingT = transpose(Xtraining);
+A = inv(XtrainingT*Xtraining)*XtrainingT*Ytraining;
 At = transpose(A);
 
 % Checking Error
 EQM = 0;
-Ye = At*Xt;
-for i = 1:(last-first + 1)
-	EQM = EQM + (Y(i)-Ye(i)).^2;
+Xe = [ones(last-half, 1) X(half+1:end, :)]; % Provided data for prediction
+Ye = At*transpose(Xe);                      % Values estimated
+Yr = Y(half+1:end, :);                      % Real values
+
+% Error calculation
+for i = 1:(last-half)
+	EQM += (Yr(i)-Ye(i)).^2;
 end
+EQM /= last-half;
 
-plot(Y, '--or');
+% Displaying results
+printf('EQM: %ld\n', EQM);
+figure
+plot(Yr, '-cp',...
+     'LineWidth', 2,...
+     'MarkerSize', 10,...
+     'MarkerEdgeColor', 'k',...
+     'MarkerFaceColor', 'g');            % Real values in red points
 hold on;
-plot(Ye, '--.k');
-
-
-disp('---- SIZES ----');
-printf('X: (%d, %d)\n', size(X)(1), size(X)(2));
-printf('Y: (%d, %d)\n', size(Y)(1), size(Y)(2));
-printf('Ye: (%d, %d)\n', size(Ye)(1), size(Ye)(2));
-printf('A: (%d, %d)\n', size(A)(1), size(A)(2));
-printf('B: (%d, %d)\n\n', size(B)(1), size(B)(2));
-
-
-% X -> matriz -> mxn
-% Y -> coluna -> 1xn
-% 
-%
-%
+plot(Ye, '-yo',...
+     'LineWidth', 2,...
+     'MarkerSize', 7,...
+     'MarkerEdgeColor', 'k',...
+     'MarkerFaceColor', 'r');            % Real values in red points
+% plot(Ye, '-k.');               % Estimated values in black circles
