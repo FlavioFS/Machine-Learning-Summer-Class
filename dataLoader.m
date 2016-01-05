@@ -1,4 +1,4 @@
-function [xData, yArray] = dataLoader(filePath, lineStart, lineEnd)
+function [xData, yArray] = dataLoader(filePath, delimiter)
 	% Reads the file and returns the data matrix and the values array
 	columnCount = 0;
 	dataFile = fopen(filePath, 'r');
@@ -10,9 +10,9 @@ function [xData, yArray] = dataLoader(filePath, lineStart, lineEnd)
 		yArray = [];
 		return;
 	else
-		line = strsplit(line);                  % Line String to String Array
+		line = strsplit(line, delimiter);       % Line String to String Array
 		line = line(~cellfun('isempty', line)); % Removes blank elements
-		columnCount = length(line);
+		columnCount = size(line(1,:))(1,2);		% The second element of size of line (1 x rowCount)
 
 		xData  = [line(1:columnCount-1)];
 		yArray = [line(1, columnCount)];
@@ -24,7 +24,7 @@ function [xData, yArray] = dataLoader(filePath, lineStart, lineEnd)
 		if (isempty(line))
 			break;
 		else
-			line = strsplit(line);                  % Line String to String Array
+			line = strsplit(line, delimiter);       % Line String to String Array
 			line = line(~cellfun('isempty', line)); % Removes blank elements
 
 			xData  = [xData; line(1:columnCount-1)];
@@ -32,23 +32,8 @@ function [xData, yArray] = dataLoader(filePath, lineStart, lineEnd)
 		end
 	end
 
-	% Converts the string elements to double
-	xData  = cellfun(@str2num,  xData);
-	yArray = cellfun(@str2num, yArray);
-
 	% Shuffling
 	newOrder = randperm(size(yArray,1));
 	xData  = xData(newOrder, :);
 	yArray = yArray(newOrder, :);
-
-	% Splits the matrix through the line delimiter
-	if (nargin == 3)
-		if (lineStart > lineEnd)
-			temp = lineStart;
-			lineStart = lineEnd;
-			lineEnd = temp;
-		end
-		xData = xData(lineStart:lineEnd, :);
-		yArray = yArray(lineStart:lineEnd, :);
-	end
 end

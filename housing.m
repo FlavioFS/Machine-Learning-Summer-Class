@@ -1,41 +1,55 @@
 % Loading
-first = 1;
-last  = 506;
-half = 253;
-[X, Y]  = dataLoader('data/housing.data', first, last);
+[X, Y]  = dataLoader('data/housing.data', ' ');
+total = size(X(:,1))(1,1);
+breakpoint = floor(total/2);
 
-% Calculating A
-B = ones(half, 1);
-Xtraining = [B X(1:half, :)];
-Ytraining = Y(1:half, :);
+% Converts the string elements to double
+X  = cellfun(@str2double,  X);
+Y = cellfun(@str2double, Y);
+
+% Adding the one for the constant term
+B = ones(total, 1);
+X = [B X];
+
+% Training
+Xtraining = X(1:breakpoint, :);
+Ytraining = Y(1:breakpoint, :);
 XtrainingT = transpose(Xtraining);
 A = inv(XtrainingT*Xtraining)*XtrainingT*Ytraining;
 At = transpose(A);
 
 % Checking Error
 EQM = 0;
-Xe = [ones(last-half, 1) X(half+1:end, :)]; % Provided data for prediction
-Ye = At*transpose(Xe);                      % Values estimated
-Yr = Y(half+1:end, :);                      % Real values
+prediction_X = X(breakpoint+1:end, :);     % Provided data for prediction
+prediction_Y = At*transpose(prediction_X); % Values estimated
+real_Y       = Y(breakpoint+1:end, :);     % Real values
 
 % Error calculation
-for i = 1:(last-half)
-	EQM += (Yr(i)-Ye(i)).^2;
+for i = 1:(total-breakpoint)
+	EQM += (real_Y(i)-prediction_Y(i)).^2;
 end
-EQM /= last-half;
+EQM /= total-breakpoint;
 
 % Displaying results
 printf('EQM: %ld\n', EQM);
+
+% Plotting
 figure
-plot(Yr, '-cp',...
-     'LineWidth', 2,...
+plot(real_Y, '--wp',...
+     'LineWidth', 1,...
      'MarkerSize', 10,...
-     'MarkerEdgeColor', 'k',...
-     'MarkerFaceColor', 'g');            % Real values in red points
+     'MarkerEdgeColor', 'w',...
+     'MarkerFaceColor', 'c');
 hold on;
-plot(Ye, '-yo',...
+plot(prediction_Y, '--ko',...
      'LineWidth', 2,...
      'MarkerSize', 7,...
      'MarkerEdgeColor', 'k',...
-     'MarkerFaceColor', 'r');            % Real values in red points
-% plot(Ye, '-k.');               % Estimated values in black circles
+     'MarkerFaceColor', 'r');
+
+daLegend = legend({'Real Values', 'Estimated Values'});
+set(daLegend,'color', 'none');
+set(daLegend,'FontSize', 10);
+set(daLegend,'FontWeight', 'bold');
+set(gca, 'color', [0.3 0.3 0.3]);  % Background color (chart area)
+set(gcf, 'color', [0.4 0.4 0.4]);  % Background color (area outside of chart)
