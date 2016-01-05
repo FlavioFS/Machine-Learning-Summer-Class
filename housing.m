@@ -1,5 +1,5 @@
 % Loading
-[X, Y]  = dataLoader('data/housing.data', ' ');
+[X, Y]  = dataLoader('data/housing.data', ' ', 'shuffle');
 total = size(X(:,1))(1,1);
 breakpoint = floor(total/2);
 

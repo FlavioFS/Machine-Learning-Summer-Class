@@ -1,4 +1,4 @@
-function [xData, yArray] = dataLoader(filePath, delimiter)
+function [xData, yArray] = dataLoader(filePath, delimiter, shuffle)
 	% Reads the file and returns the data matrix and the values array
 	columnCount = 0;
 	dataFile = fopen(filePath, 'r');
@@ -33,7 +33,9 @@ function [xData, yArray] = dataLoader(filePath, delimiter)
 	end
 
 	% Shuffling
-	newOrder = randperm(size(yArray,1));
-	xData  = xData(newOrder, :);
-	yArray = yArray(newOrder, :);
+	if (nargin > 2)
+		newOrder = randperm(size(yArray,1));
+		xData  = xData(newOrder, :);
+		yArray = yArray(newOrder, :);
+	end
 end
