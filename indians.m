@@ -11,7 +11,17 @@ Y = cellfun(@str2num   , Y);
 B = ones(total, 1);
 X = [B X];
 
-% Training
+% ---------------------------------------------------
+% Training Assets
+training_X = X(1:breakpoint, :);
+training_Xt = transpose(training_X);
+training_Y = Y(1:breakpoint, :);
+
+% Training (A calculation)
+
+
+% ---------------------------------------------------
+
 
 % % Training
 % Xtraining = X(1:breakpoint, :);

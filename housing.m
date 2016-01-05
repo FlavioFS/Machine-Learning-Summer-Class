@@ -7,18 +7,22 @@ breakpoint = floor(total/2);
 X  = cellfun(@str2double,  X);
 Y = cellfun(@str2double, Y);
 
-% Adding the one for the constant term
+% Adds the 1's for the constant term
 B = ones(total, 1);
 X = [B X];
 
-% Training
-Xtraining = X(1:breakpoint, :);
-Ytraining = Y(1:breakpoint, :);
-XtrainingT = transpose(Xtraining);
-A = inv(XtrainingT*Xtraining)*XtrainingT*Ytraining;
+% ---------------------------------------------------
+% Training Assets
+training_X = X(1:breakpoint, :);
+training_Xt = transpose(training_X);
+training_Y = Y(1:breakpoint, :);
+
+% Training (A calculation)
+A = inv(training_Xt*training_X)*training_Xt*training_Y;
 At = transpose(A);
 
-% Checking Error
+% ---------------------------------------------------
+% Error Assets
 EQM = 0;
 prediction_X = X(breakpoint+1:end, :);     % Provided data for prediction
 prediction_Y = At*transpose(prediction_X); % Values estimated
@@ -28,10 +32,10 @@ real_Y       = Y(breakpoint+1:end, :);     % Real values
 for i = 1:(total-breakpoint)
 	EQM += (real_Y(i)-prediction_Y(i)).^2;
 end
-EQM /= total-breakpoint;
+EQM /= (total-breakpoint);
 
-% Displaying results
-printf('EQM: %ld\n', EQM);
+% ---------------------------------------------------
+printf('EQM: %ld\n', EQM);	        % Displaying Error
 
 % Plotting
 figure
