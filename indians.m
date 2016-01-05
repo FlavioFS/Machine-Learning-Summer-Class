@@ -36,7 +36,7 @@ end
 %% Training
 MAX_ATTEMPTS = 10;
 MAX_SQERROR = breakpoint * 0.1;
-learningFactor = 0.0001045;
+learningFactor = 0.000104;
 attempts = 0;
 while ((attempts < MAX_ATTEMPTS))
 	% Shuffle
