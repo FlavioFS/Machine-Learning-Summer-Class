@@ -12,16 +12,16 @@ Y = diabetes(:, COLUMNS);
 
 % Standard Score of Columns
 for i=2:COLUMNS
-	% disp(norm(X(:,i)));
-	% X(:,i) = X(:,i)/norm(X(:,i));
-	X = zscore(X);
+	X = [X(:,1) zscore(X(:, 2:end))];
 end;
+
+X = transpose(X);
 
 % ---------------------------------------------------
 %% Training Assets
-training_X  = X(1:breakpoint, :);
+training_X  = X(:, 1:breakpoint);
 training_Y  = Y(1:breakpoint, :);
-A = transpose(ones(size(X(1,:))));   % Starting value of A
+A = ones(COLUMNS,1);   % Starting value of A
 
 % Hypothesis function
 % h: Estimates Yi for Xi
@@ -33,14 +33,13 @@ end;
 function outputs = SQErrorTraining(training_X, training_Y, A, breakpoint)
 	outputs = 0.0;
 	for i=1:breakpoint
-		delta = ( training_Y(i) - h(transpose(training_X(i,:)), A) ).^2;
+		delta = ( training_Y(i) - h(training_X(:,i), A) ).^2;
 		outputs += delta;
 	end;
-	% printf('Error: %f\n', outputs);
 end;
 
 %% Training
-MAX_ATTEMPTS = 20;
+MAX_ATTEMPTS = 15;
 MAX_SQERROR = breakpoint * 0.1;
 learningFactor = 1;
 % learningFactor = 0.000104;
@@ -48,27 +47,26 @@ attempts = 0;
 while (attempts < MAX_ATTEMPTS)
 	% Shuffle
 	newOrder = randperm(size(training_Y,1));
-	shuffled_X = training_X(newOrder, :);
+	shuffled_X = training_X(:, newOrder);
 	shuffled_Y = training_Y(newOrder, :);
 
 	for i=1:breakpoint
-		Xi = transpose(shuffled_X(i,:));
+		Xi = shuffled_X(:,i);
 		hXi = h(Xi, A);
-		% printf('----- %3d (alfa: %f) -----\n', i, learningFactor);
-		% printf('A:  ');
-		% disp(transpose(A));
-		% printf('Xi: ');
-		% disp(transpose(Xi));
 		A = A + learningFactor * ( training_Y(i) - hXi )  * hXi * ( 1 - hXi ) * Xi;
-		learningFactor = 1000 / (1000 + i + attempts*breakpoint);
+		learningFactor = 1000 / (1000 + (i + attempts*breakpoint)/2);
 	end;
+	
 	attempts++;
 end;
 
+% printf('----- %d (alfa: %f) -----\n', attempts, learningFactor);
+% printf('A:  ');
+% disp(transpose(A));
 
 % ---------------------------------------------------
 %% Prediction Assets
-prediction_X = X(breakpoint+1:end, :);
+prediction_X = X(:, breakpoint+1:end);
 real_Y       = Y(breakpoint+1:end, :);
 
 % SQErrorFinal: Calculates the squared error for the final sample
@@ -77,7 +75,7 @@ function [matches, percent, prediction_Y] = SQErrorFinal(prediction_X, real_Y, A
 	TOTAL = size(real_Y(:,1));
 	prediction_Y = zeros(TOTAL, 1);
 	
-	guessTemp = transpose(A) * transpose(prediction_X);
+	guessTemp = transpose(A) * prediction_X;
 
 	% disp(guessTemp);
 	guessTemp = transpose(guessTemp);
@@ -91,10 +89,9 @@ function [matches, percent, prediction_Y] = SQErrorFinal(prediction_X, real_Y, A
 
 		if real_Y(i,1) == prediction_Y(i,1)
 			matches++;
-			% printf('%d ', i);
 		end;
 
-		% printf('\tguessTemp(%3d): %f   real_Y: %d   prediction_Y: %d   result: %d\n', i, guessTemp(i,1), real_Y(i,1), prediction_Y(i,1), (real_Y(i,1) == prediction_Y(i,1)));
+		% printf('\tguessTemp(%3d): %9f   real_Y: %d   prediction_Y: %d   result: %d\n', i, guessTemp(i,1), real_Y(i,1), prediction_Y(i,1), (real_Y(i,1) == prediction_Y(i,1)));
 	end;
 
 	percent = 1 - (matches/TOTAL(1));
@@ -107,22 +104,22 @@ percent *= 100;
 printf('\nError: %d%% (Score: %d/%d)\n', percent, matches, TOTAL-breakpoint);
 
 % Plotting
-% figure
-% plot(real_Y, 'wp',...
-%      'LineWidth', 1,...
-%      'MarkerSize', 10,...
-%      'MarkerEdgeColor', 'w',...
-%      'MarkerFaceColor', 'c');
-% hold on;
-% plot(prediction_Y, 'ko',...
-%      'LineWidth', 2,...
-%      'MarkerSize', 5,...
-%      'MarkerEdgeColor', 'k',...
-%      'MarkerFaceColor', 'r');
+figure
+plot(real_Y, 'wp',...
+     'LineWidth', 1,...
+     'MarkerSize', 10,...
+     'MarkerEdgeColor', 'w',...
+     'MarkerFaceColor', 'c');
+hold on;
+plot(prediction_Y, 'ko',...
+     'LineWidth', 2,...
+     'MarkerSize', 5,...
+     'MarkerEdgeColor', 'k',...
+     'MarkerFaceColor', 'r');
 
-% daLegend = legend({'Real Values', 'Estimated Values'});
-% set(daLegend,'color', 'none');
-% set(daLegend,'FontSize', 10);
-% set(daLegend,'FontWeight', 'bold');
-% set(gca, 'color', [0.3 0.3 0.3]);  % Background color (chart area)
-% set(gcf, 'color', [0.4 0.4 0.4]);  % Background color (area outside of chart)
+daLegend = legend({'Real Values', 'Estimated Values'});
+set(daLegend,'color', 'none');
+set(daLegend,'FontSize', 10);
+set(daLegend,'FontWeight', 'bold');
+set(gca, 'color', [0.3 0.3 0.3]);  % Background color (chart area)
+set(gcf, 'color', [0.4 0.4 0.4]);  % Background color (area outside of chart)
