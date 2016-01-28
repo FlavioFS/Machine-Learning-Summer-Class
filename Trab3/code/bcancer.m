@@ -14,12 +14,11 @@ BREAKPOINT = floor(TOTAL*0.7);			% Separating the trainin from the prediction
 %% Creating the Xt matrix
 training_X = wdbc(1:BREAKPOINT, 3:COLUMNS_LOAD);					% 3rd to last columns
 training_X = zscore(training_X);									% Standard Score of Columns ("Normalizing")
-training_X = [ones(BREAKPOINT, 1) training_X(1:BREAKPOINT, 1:end)];	% 1's for constant term
+training_X = [ones(BREAKPOINT, 1) training_X(1:end, 1:end)];		% 1's for constant term
 training_X = transpose(training_X);									% Real X is based on columns, not lines
 
 %% Creating the Yt matrix
 training_Y = wdbc(1:BREAKPOINT, 2); % 2nd column
-training_Y = training_Y;
 
 
 
@@ -28,7 +27,7 @@ training_Y = training_Y;
 %%%%                                  Definitions                                %%%%
 %%%% =========================================================================== %%%%
 
-%% Wgen: Creates a new weight array with random elements  (reused in hidden layers for M)
+%% Wgen: Creates a new weight array with random elements inside [0, 0.1] (reused in hidden layers for M)
 function output = Wgen(arrayCount, fieldCount)
 	output = rand(arrayCount, fieldCount) / 10;
 end
@@ -70,13 +69,6 @@ end
 
 
 %%%% =========================================================================== %%%%
-%%%%                                    Tests                                    %%%%
-%%%% =========================================================================== %%%%
-
-
-
-
-%%%% =========================================================================== %%%%
 %%%%                                  Training                                   %%%%
 %%%% =========================================================================== %%%%
 
@@ -84,38 +76,90 @@ PERCEPTRON_COUNT = 10;						%ç Creating several perceptrons
 ALPHA = 0.2;								%ç Learning factor
 
 W = Wgen(PERCEPTRON_COUNT, COLUMNS_X);
-M = Wgen(1, PERCEPTRON_COUNT);
+M = Wgen(1, PERCEPTRON_COUNT + 1);
 
 YpList = zeros(BREAKPOINT, 1);
 
-for j = 1:BREAKPOINT
-	sample = training_X(:, j);				%ç The column shown
+for age = 1:3
+	reordered = randperm(size(training_Y,1));
+	training_X = training_X(:, reordered);
+	training_Y = training_Y(reordered, :);
 
-	% Input Layer
-	Ui = W * sample;						%ç Array from W * X
-	Zi = PhiArray(Ui);						%ç Array of intermediate results: [Phi(Ui)]
-	dZi = DPhiArray(Ui);					%ç Array of Zi's derivatives
+	for j = 1:BREAKPOINT
+		sample = training_X(:, j);				%ç The column shown
 
-	% Hidden Layer 1
-	Uk = M * Zi;							%ç Float from M * Z
-	Yp = Phi(Uk);							%ç Predicted Y: Phi(Uk)
-	dYp = DPhi(Uk);							%ç Yp's derivative
+		% Input Layer
+		Ui = W * sample;						%ç Array from W * X
+		Zi = PhiArray(Ui);						%ç Array of intermediate results: [Phi(Ui)]
+		Zi = zscore(Zi);						%ç Standardizing the sample
+		Zi = [1;Zi];							%ç Added linear coefficient
+		dZi = DPhiArray(Ui);					%ç Array of Zi's derivatives
 
-	YpList(j, 1) = Yp;
+		% Hidden Layer 1
+		Uk = M * Zi;							%ç Float from M * Z
+		Yp = Phi(Uk);							%ç Predicted Y: Phi(Uk)
+		dYp = DPhi(Uk);							%ç Yp's derivative
 
-	% Updating M
-	Errk = Yp - training_Y(j, 1);			%ç Error
-	DeltaK = Errk * dYp;					%ç Float
-	M += ALPHA * DeltaK * transpose(Zi);
+		YpList(j, 1) = Yp;
 
-	% Error Backpropagation
-	for i = 1:PERCEPTRON_COUNT
-		DeltaI = dZi(i, 1) * DeltaK * M(1, i);
-		W(i, :) += ALPHA * DeltaI * transpose(sample);
+		% Updating M
+		Errk = Yp - training_Y(j, 1);			%ç Error
+		DeltaK = Errk * dYp;					%ç Float
+		M += ALPHA * DeltaK * transpose(Zi);
+
+		% Error Backpropagation
+		for i = 1:PERCEPTRON_COUNT
+			DeltaI = dZi(i, 1) * DeltaK * M(1, i);
+			W(i, :) += ALPHA * DeltaI * transpose(sample);
+		end
+
+		% ALPHA = 2/(10 + (j-1) + (age-1)*BREAKPOINT);
 	end
 end
 
-W
-M
-Yp
-YpList
+%%%% =========================================================================== %%%%
+%%%%                                  Predicting                                 %%%%
+%%%% =========================================================================== %%%%
+PREDICTION_START = BREAKPOINT + 1;
+PREDICTION_AMOUNT = TOTAL-BREAKPOINT;
+
+%% Creating the Xp matrix
+prediction_X = wdbc(PREDICTION_START:TOTAL, 3:COLUMNS_LOAD);			%ç 3rd to last columns
+prediction_X = zscore(prediction_X);									%ç Standard Score of Columns ("Normalizing")
+prediction_X = [ones(PREDICTION_AMOUNT, 1) prediction_X(1:end, 1:end)];	%ç 1's for constant term
+prediction_X = transpose(prediction_X);									%ç Real X is based on columns, not lines
+
+%% Creating the Yp matrix
+real_Y = wdbc(PREDICTION_START:TOTAL, 2); % 2nd column
+guess_Y = zeros(PREDICTION_AMOUNT, 1);
+
+correct = 0;
+
+for j = 1:PREDICTION_AMOUNT	
+	sample = prediction_X(:, j);	%ç The input data
+
+	% Input Layer
+	Ui = W * sample;				%ç Array from W * X
+	Zi = PhiArray(Ui);				%ç Array of intermediate results: [Phi(Ui)]
+	Zi = zscore(Zi);				%ç Standardizing the sample
+	Zi = [1;Zi];					%ç Added linear coefficient
+	dZi = DPhiArray(Ui);			%ç Array of Zi's derivatives
+
+	% Hidden Layer 1
+	Uk = M * Zi;					%ç Float from M * Z
+	Yp = Phi(Uk);					%ç Predicted Y: Phi(Uk)
+
+	if Yp > 0.5
+		guess_Y(j, 1) = 1;
+	else
+		guess_Y(j, 1) = 0;
+	end
+
+	if Yp == real_Y(j,1)
+		correct++;
+	end
+
+	% guess_Y(j, 1) = Yp;				%ç Predicted Values
+end
+
+printf ('Result: %4f%% (%3d/%3d)', correct/PREDICTION_AMOUNT, correct, PREDICTION_AMOUNT);
