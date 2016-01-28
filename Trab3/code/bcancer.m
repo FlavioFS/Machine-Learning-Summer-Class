@@ -1,3 +1,7 @@
+%%%% =========================================================================== %%%%
+%%%%                               Initial Settings                              %%%%
+%%%% =========================================================================== %%%%
+
 %% Loading
 load wdbc.data;
 
@@ -17,23 +21,93 @@ training_X = transpose(training_X);									% Real X is based on columns, not li
 training_Y = wdbc(1:breakpoint, 2); % 2nd column
 training_Y = transpose(training_Y);
 
-%% Wgen: Creates a new weight array with random elements
-function outputs = Wgen(size)
-	outputs = rand(1, size) / 10;
+
+
+
+%%%% =========================================================================== %%%%
+%%%%                                  Definitions                                %%%%
+%%%% =========================================================================== %%%%
+
+%% Wgen: Creates a new weight array with random elements  (reused in hidden layers for M)
+function output = Wgen(arrayCount, fieldCount)
+	output = rand(arrayCount, fieldCount) / 10;
 end
 
-%% Ui: Multiplies a weight matrix W for an input array X
-function outputs = Ui(Wi, Xi)
-	outputs = Wi(1, :) * Xi(:, 1);
+%% Ui: Multiplies a weight matrix W (or M) for an input array X
+function output = Ui(Wi, Xi)
+	output = Wi(1, :) * Xi(:, 1);
 end
-
 
 %% Phi: Error (evaluation function)
-% function error = U(w, )
-% 	error = 1 / (1 + exp());
+function output = Phi(Ui)
+	output = 1 / (1 + exp(-Ui));
+end
+
+%% DPhi: Error derivative
+function output = DPhi(Ui)
+	phi = Phi(Ui);
+	output = phi * (1 - phi);
+end
+
+%% Phi: Error (evaluation function) for an array U of values
+function output = PhiArray(U)
+	samples = size(U(:,1))(1,1);	% Amount of elements in first column
+	for i = 1:samples
+		output(i,1) = Phi(-U(i,1));
+	end
+end
+
+%% DPhi: Error derivative for an array U of values
+function output = DPhiArray(U)
+	samples = size(U(:,1))(1,1);	% Amount of elements in first column
+	for i = 1:samples
+		phi = Phi(-U(i,1));
+		output(i,1) = phi * (1-phi);
+	end
+end
+
+% %% Yp: Predicted value of Y
+% function output = Yp(Zi, Mi)
+% 	output = Phi(Wi * Xi);
+% end	
+
+% % Error: Yreal - Ypredicted
+% function output = Error(Yr, Yp)
+% 	output = (Yr - Yp);
 % end
 
-%% Phi: Error (evaluation function)
-% function error = Phi(u)
-% 	error = 1 / (1 + exp());
+
+%%%% =========================================================================== %%%%
+%%%%                                    Tests                                    %%%%
+%%%% =========================================================================== %%%%
+	
+% X1 = training_X(:,1)
+% W1 = Wgen(COLUMNS_X)
+% U1 = Ui(W1, X1)
+% Z1 = Phi(U1)
+% dZ1 = DPhi(U1)
+
+
+%%%% =========================================================================== %%%%
+%%%%                                  Training                                   %%%%
+%%%% =========================================================================== %%%%
+
+%% Creating several perceptrons
+PERCEPTRON_COUNT = 10;
+
+%% Input Layer
+W = Wgen(PERCEPTRON_COUNT, COLUMNS_X);
+Ui = W * training_X(:, 1);
+Z = PhiArray(Ui);
+
+%% Hidden Layer 1
+M = Wgen(1, PERCEPTRON_COUNT);
+Uk = M * Z;
+Yp = PhiArray(Uk);
+DYp = DPhiArray(Uk);
+
+% for i = 1:PERCEPTRON_COUNT
+% 	W(i,:) = Wgen(COLUMNS_X);
+% 	Z(i,1) = W(i,:) * training_X(:,i);
+% 	Yp = Phi(M * Z)
 % end
