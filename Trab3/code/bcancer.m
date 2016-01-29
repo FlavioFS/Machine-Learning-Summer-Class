@@ -72,7 +72,7 @@ end
 %%%%                                  Training                                   %%%%
 %%%% =========================================================================== %%%%
 
-PERCEPTRON_COUNT = 10;						%ç Creating several perceptrons
+PERCEPTRON_COUNT = 4;						%ç Creating several perceptrons
 ALPHA = 0.2;								%ç Learning factor
 
 W = Wgen(PERCEPTRON_COUNT, COLUMNS_X);
@@ -80,7 +80,7 @@ M = Wgen(1, PERCEPTRON_COUNT + 1);
 
 YpList = zeros(BREAKPOINT, 1);
 
-for age = 1:3
+for age = 1:5
 	reordered = randperm(size(training_Y,1));
 	training_X = training_X(:, reordered);
 	training_Y = training_Y(reordered, :);
@@ -103,7 +103,7 @@ for age = 1:3
 		YpList(j, 1) = Yp;
 
 		% Updating M
-		Errk = Yp - training_Y(j, 1);			%ç Error
+		Errk = training_Y(j, 1) - Yp;			%ç Error
 		DeltaK = Errk * dYp;					%ç Float
 		M += ALPHA * DeltaK * transpose(Zi);
 
@@ -155,11 +155,13 @@ for j = 1:PREDICTION_AMOUNT
 		guess_Y(j, 1) = 0;
 	end
 
-	if Yp == real_Y(j,1)
+	if (guess_Y(j,1) == real_Y(j,1))
 		correct++;
 	end
 
-	% guess_Y(j, 1) = Yp;				%ç Predicted Values
+	% printf('(%d, %d) - equal? %d\n', guess_Y(j,1), real_Y(j,1), (guess_Y(j,1) == real_Y(j,1)));
+
+	% guess_Y(j, 1) = Yp;			%ç Predicted Values
 end
 
-printf ('Result: %4f%% (%3d/%3d)', correct/PREDICTION_AMOUNT, correct, PREDICTION_AMOUNT);
+printf ('Result: %4f%% (%3d/%3d)\n', correct/PREDICTION_AMOUNT, correct, PREDICTION_AMOUNT);
