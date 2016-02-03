@@ -161,10 +161,33 @@ for j = 1:PREDICTION_AMOUNT
 	if (guess_Y(j,1) == real_Y(j,1))
 		correct++;
 	end
+	
 
 	% printf('(%d, %d) - equal? %d\n', guess_Y(j,1), real_Y(j,1), (guess_Y(j,1) == real_Y(j,1)));
 
 	% guess_Y(j, 1) = Yp;			%ç Predicted Values
 end
+
+% Plotting
+figure();
+plot(real_Y(:,1), 'gp',...
+     'LineWidth', 1,...
+     'MarkerSize', 10,...
+     'MarkerEdgeColor', 'w',...
+     'MarkerFaceColor', 'g');
+
+hold on;
+plot(guess_Y(:,1), 'ko',...
+     'LineWidth', 2,...
+     'MarkerSize', 4,...
+     'MarkerEdgeColor', 'k',...
+     'MarkerFaceColor', 'r');
+
+daLegend = legend({'Real Values', 'Estimated Values'});
+set(daLegend,'color', 'none');
+set(daLegend,'FontSize', 10);
+set(daLegend,'FontWeight', 'bold');
+set(gca, 'color', [0.3 0.3 0.3]);  % Background color (chart area)
+set(gcf, 'color', [0.4 0.4 0.4]);  % Background color (area outside of chart)
 
 printf ('Result: %4f%% (%3d/%3d)\n', correct/PREDICTION_AMOUNT, correct, PREDICTION_AMOUNT);

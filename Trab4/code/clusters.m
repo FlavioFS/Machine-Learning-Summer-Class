@@ -42,6 +42,18 @@ function output = CenterGen(centerCount, samples)
 	end
 end
 
+%% CenterPick: Picks a random elements of the sample as starting centers
+function output = CenterPick(centerCount, samples)
+	sampleAmount = size(samples(1,:))(1,2);
+	output = zeros(centerCount, sampleAmount);
+	
+	for centerIterator = 1 : centerCount
+		index = floor(1 + (sampleAmount) * rand(1));
+		output(centerIterator, :) = transpose(samples(index, :));
+	end
+	
+end
+
 %% CalcDistances: Calculate all the distances
 function [outputs] = CalcDistances(samples, centers)
 	centerAmount = size(centers(:,1))(1,1);
