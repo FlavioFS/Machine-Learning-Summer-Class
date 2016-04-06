@@ -1,0 +1,22 @@
+﻿Aprendizagem Automática
+Lista 1
+
+Questão 1
+
+Seguem abaixo dois grupos de figuras
+a) Dados de um caso intermediário
+20 épocas de treinamento;
+Regressão: y = 0.91867*x – 1.0403
+abaixo: 1000 épocas de treinamento;
+Erro quadrático médio (no final): 11.219
+Figuras:
+
+O modelo de regressão linear
+
+
+a) Dados do caso solicitado
+1000 épocas de treinamento;
+Regressão: y = 0.91867*x – 1.0403
+abaixo: 1000 épocas de treinamento;
+Erro quadrático médio (no final): 11.219
+Figuras:
