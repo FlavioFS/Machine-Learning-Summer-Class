@@ -14,7 +14,7 @@ W1 = 0.1;
 
 % Constants
 ALPHA = 0.001;
-PASSES = 20;
+PASSES = 1000;
 
 % --------- Training ----------
 EQMList = [];
