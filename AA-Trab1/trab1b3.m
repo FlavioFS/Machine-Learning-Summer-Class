@@ -7,7 +7,7 @@ BREAKPOINT = 30;
 % ------- Input Section -------
 X = ex1data3(1:BREAKPOINT, 1:ARGS);
 Y = ex1data3(1:BREAKPOINT, end);
-LAMBDA = [0 1 1 1 1 3];
+LAMBDA = [0 1 1 1 1 1] * 5;
 
 X = [ones(BREAKPOINT, 1) X];
 Xt = transpose(X);
