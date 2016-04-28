@@ -2,28 +2,34 @@ load ex1data2.txt
 
 DATA_47 = 47;
 ARGS = 2;
+BREAKPOINT = 30;
 
 % ------- Input Section -------
-X = ex1data2(:, 1:ARGS);
-Y = ex1data2(:, end);
+X = ex1data2(1:DATA_47, 1:ARGS);
+Y = ex1data2(1:DATA_47, end);
 
 
 X = [ones(DATA_47, 1) X];
-Xt = transpose(X);
+
+Xl = X(1:BREAKPOINT, 1:ARGS);
+Xlt = transpose(Xl);
+Yl = Y(1:BREAKPOINT);
 % X = zscore(X);
 % -----------------------------
 
 % --------- Training ----------
-W = inv(Xt * X) * Xt * Y;
+W = inv(Xlt * Xl) * Xlt * Yl;
 Wt = transpose(W);
-Yp = transpose(Wt * Xt);
 % -----------------------------
 
 % Error
 EQM = 0;
 ERRList = [];
-for i = 1 : DATA_47
-	Ei = Y(i) - Yp(i);
+Xc = X(BREAKPOINT+1:end, 1:ARGS);
+Yc = Y(BREAKPOINT+1:end);
+Yp = transpose(Wt * transpose(Xc));
+for i = 1 : DATA_47 - BREAKPOINT
+	Ei = Yc(i) - Yp(i);
 	ERRList = [ERRList; Ei];
 	EQM += Ei^2;
 end
@@ -31,7 +37,7 @@ end
 EQM /= DATA_47;
 
 % Plotting
-errorbar(Y, ERRList, '-g.');
+errorbar(Yc, ERRList, '-g.');
 hold on;
 
 legend({'Error Bars'});
