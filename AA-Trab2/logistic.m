@@ -61,7 +61,8 @@ while (attempts < MAX_ATTEMPTS)
 	for i=1:breakpoint
 		Xi = shuffled_X(:,i);
 		hXi = h(Xi, A);
-		A = A + learningFactor * ( training_Y(i) - hXi )  * hXi * ( 1 - hXi ) * Xi;
+		% A = A + learningFactor * ( training_Y(i) - hXi )  * hXi * ( 1 - hXi ) * Xi;
+		A = A + learningFactor * ( training_Y(i) - hXi ) * Xi;
 		% learningFactor = 1000 / (1000 + (i + attempts*breakpoint)/2);
 	end;
 	

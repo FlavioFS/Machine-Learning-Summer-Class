@@ -23,9 +23,9 @@ function output = mapThis(X1, X2)
 	end
 end
 
-wow = mapThis(X1, X2);
+featuredX = mapThis(X1, X2);
 
-save wow.mat wow
+save featuredX.mat featuredX
 
 % function out = mappo(X1, X2)
 % MAPFEATURE Feature mapping function to polynomial features
