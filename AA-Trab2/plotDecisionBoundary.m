@@ -1,3 +1,14 @@
+%% mapFeature: function description
+function output = mapFeature(X1, X2)
+    degree = 30;
+    output = ones(size(X1(:,1)));
+    for i = 1:degree
+        for j = 0:i
+            output(:, end+1) = (X1.^(i-j)).*(X2.^j);
+        end
+    end
+end
+
 function plotDecisionBoundary(theta, X, y)
 %PLOTDECISIONBOUNDARY Plots the data points X and y into a new figure with
 %the decision boundary defined by theta
@@ -43,8 +54,8 @@ else
             z(i,j) = mapFeature(u(i), v(j))*theta;
         end
     end
-    z = z'; % important to transpose z before calling contour
-
+    z = transpose(z); % important to transpose z before calling contour
+    
     % Plot z = 0
     % Notice you need to specify the range [0, 0]
     contour(u, v, z, [0, 0], 'LineWidth', 2)

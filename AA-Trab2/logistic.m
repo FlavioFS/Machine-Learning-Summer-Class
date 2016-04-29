@@ -56,13 +56,11 @@ while (attempts < MAX_ATTEMPTS)
 	shuffled_X = training_X(:, newOrder);
 	shuffled_Y = training_Y(newOrder, :);
 
-	
-
 	for i=1:breakpoint
 		Xi = shuffled_X(:,i);
 		hXi = h(Xi, A);
-		% A = A + learningFactor * ( training_Y(i) - hXi )  * hXi * ( 1 - hXi ) * Xi;
-		A = A + learningFactor * ( training_Y(i) - hXi ) * Xi;
+		A = A + learningFactor * ( training_Y(i) - hXi )  * hXi * ( 1 - hXi ) * Xi;
+		% A = A + learningFactor * ( training_Y(i) - hXi ) * Xi;
 		% learningFactor = 1000 / (1000 + (i + attempts*breakpoint)/2);
 	end;
 	
@@ -125,6 +123,40 @@ end;
 percent *= 100;
 printf('\nError: %d%% (Score: %d/%d)\n', percent, matches, TOTAL-breakpoint);
 
+X10 = []; 
+X20 = [];
+
+X11 = [];
+X21 = [];
+for i=1:TOTAL
+	if Y(i) == 0
+		X10 = [X10 X(2,i)];
+		X20 = [X20 X(3,i)];
+	else
+		X11 = [X11 X(2,i)];
+		X21 = [X21 X(3,i)];
+	end
+end
+
+figure
+plot (X10, X20, 'r.');
+hold on;
+plot (X11, X21, 'g.');
+hold on;
+
+daLegend = legend({'Reproved', 'Approved'});
+set(daLegend,'color', 'none');
+set(daLegend,'FontSize', 10);
+set(daLegend,'FontWeight', 'bold');
+set(gca, 'color', [0.3 0.3 0.3]);  % Background color (chart area)
+set(gcf, 'color', [0.4 0.4 0.4]);  % Background color (area outside of chart)
+
+horiz = -2:0.2:2;
+tangent = (A(1) + A(2))/A(3);
+plot (horiz, horiz * tangent);
+set(gca, 'color', [0.3 0.3 0.3]);  % Background color (chart area)
+set(gcf, 'color', [0.4 0.4 0.4]);  % Background color (area outside of chart)
+
 % Plotting
 % figure
 % plot(real_Y, 'wp',...
@@ -139,9 +171,6 @@ printf('\nError: %d%% (Score: %d/%d)\n', percent, matches, TOTAL-breakpoint);
 %      'MarkerEdgeColor', 'k',...
 %      'MarkerFaceColor', 'r');
 
-% daLegend = legend({'Real Values', 'Estimated Values'});
-% set(daLegend,'color', 'none');
-% set(daLegend,'FontSize', 10);
-% set(daLegend,'FontWeight', 'bold');
-% set(gca, 'color', [0.3 0.3 0.3]);  % Background color (chart area)
-% set(gcf, 'color', [0.4 0.4 0.4]);  % Background color (area outside of chart)
+
+% a0 + a1.x + a2.y = 0
+% y = (a0 + a1.x) / a2
