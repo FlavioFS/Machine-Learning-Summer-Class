@@ -8,7 +8,7 @@
 ## :book: Description
 Computer Science Bachelor's degree assignments [January ~ May 2016].
 
-## :mortar_board: Classes:
+## :mortar_board: Classes
  - Machine Learning
  - Automated Learning
 
