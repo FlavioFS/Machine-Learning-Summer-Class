@@ -1,21 +1,24 @@
-# Machine Learning and Automated Learning Summer Classes (2016)
+# :robot: "Machine Learning" and "Automated Learning" Summer Classes (2016)
 
 > :warning: This repo was ported from Bitbucket!
 
-## Description
+<img src="AA-Trab2/figure/q2lambda0d.png" alt="Preview image failed to load!" width="400"/>|<img src="AA-Trab2/figure/data.png" alt="Preview image failed to load!" width="400"/>
+:---:|:---:
+
+## :book: Description
 Computer Science Bachelor's degree assignments [January ~ May 2016].
 
-## Classes:
+## :mortar_board: Classes:
  - Machine Learning
  - Automated Learning
 
-## Technology
+## :computer: Technology
  - Octave
  - Implementations and solutions from scratch
  - No usage of Machine Learning APIs (e.g.: Tensorflow)
  - Handling matrix operations directly
 
-## Contents
+## :scroll: Contents
  - Linear regression
  - Logistic regression
  - Regularization
@@ -25,7 +28,7 @@ Computer Science Bachelor's degree assignments [January ~ May 2016].
  - Cluster analysis
  - K-means
 
-## Problems solved
+## :unlock: Problems solved
  - Boston Housing
  - Flower classification
  - Pima-indians diabetes
