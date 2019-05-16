@@ -1,4 +1,4 @@
-# Machine Learning Summer Class
+# Machine Learning Summer Class (2016)
 
 > :warning: This repo was ported from Bitbucket!
 
